@@ -1,0 +1,20 @@
+{
+  "name": "three",
+  "version": "1.0.0",
+  "description": "node modules",
+  "main": "_1.js",
+  "scripts": {
+    "start": "node _2.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ankur",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "express": "git+https://github.com/expressjs/express.git",
+    "git": "^0.1.5",
+    "lodash": "^4.17.15",
+    "nodemon": "^2.0.2",
+    "string-format": "^2.0.0"
+  }
+}

@@ -1,0 +1,19 @@
+//- <html>
+//- <body>
+//- <h1>Hello</h1>
+//- </body>
+//- </html>
+
+html
+    body
+        h1 hello wow pug template from pug
+        h1 #{message}
+        if friends ==0 
+            p no friends
+        else
+            p #{friends} Friends
+
+        div test #{message}
+        ul 
+            - for (i=1; i<=count;i++)
+                li #{i}

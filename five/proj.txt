@@ -1,0 +1,17 @@
+list of courses
+screen to add/ create courses, students, let students subscribe to coursesimplement w concepts taught
+login etc
+
+think about evisioning it as a feature
+eg add professors etcsearch based on professors
+etc
+
+
+write a paragraph of what you are trying to do
+submit in public github
+send link 
+
+next thursday midnight
+can use db, file, excel etc
+can use pug, etc any other advance concepts (use templates, not only pug. anything)
+text file/readme file mentioning what has been implemented based on what has been learnt in the class
