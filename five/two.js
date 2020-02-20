@@ -1,6 +1,6 @@
 const fs=require('fs');
 
-function readFile(filename, type){
+function readFil(filename, type){
     const promise= new Promise((resolve, reject)=>{
         fs.readFile(filename, type, (err, data)=>{
             if(err){ return reject(err);}
@@ -10,7 +10,7 @@ function readFile(filename, type){
     return promise;
 }
 
-const promise = readFile('./test.json','utf-8');
+const promise = readFil('./test.json','utf-8');
 
 promise
     .then((data)=> console.log(data))
