@@ -1,0 +1,15 @@
+authentication
+authorisation
+
+REST API Authentication
+
+    Authentication is the verification of the credentials of the connection attempt.
+    Authorization is the verification that the connection attempt is allowed.
+
+
+
+tokens
+Buffer.from("dssdgdg",'base64')
+
+JWT
+json web token integration
