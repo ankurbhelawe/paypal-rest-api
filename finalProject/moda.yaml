@@ -8,7 +8,7 @@ info:
     email: bhelawe2017@gmail.com
 externalDocs:
   description: Find out more about Moda
-  url: 'http://swagger.io'
+  url: 'https://github.com/ankurbhelawe/paypal-rest-api/tree/master/finalProject'
 # Added by API Auto Mocking Plugin
 servers:
 # Added by API Auto Mocking Plugin
@@ -19,34 +19,16 @@ servers:
 tags:
   - name: admin
     description: Admin operations
-    externalDocs:
-      description: Find out more
-      url: 'http://swagger.io'
   - name: employee
     description: Employee operations
-    externalDocs:
-      description: Find out more
-      url: 'http://swagger.io'
   - name: designCentre
-    description: Operations at our design centre
-    externalDocs:
-      description: Find out more about our design process
-      url: 'http://swagger.io'
+    description: Operations at our Design Centres
   - name: manufacturingHub
-    description: Operations at our manufacturing hubs worldwide
-    externalDocs:
-      description: Find out more about our manufacturing process
-      url: 'http://swagger.io'
+    description: Operations at our Manufacturing Hubs worldwide
   - name: warehouse
-    description: Operations at our warehouses worldwide
-    externalDocs:
-      description: Find out more about how our warehouses work
-      url: 'http://swagger.io'
+    description: Operations at our Warehouses worldwide
   - name: store
-    description: Operations at our stores worldwide
-    externalDocs:
-      description: Find out more about our stores
-      url: 'http://swagger.io'
+    description: Operations at our Stores worldwide
 paths: 
   '/employee':
     post:
