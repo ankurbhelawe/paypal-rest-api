@@ -1,0 +1,4319 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Moda'
+  description: 'Moda is a proposed international high fashion brand. This is the API Spec of the product management system for Moda.'
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: bhelawe2017@gmail.com
+externalDocs:
+  description: Find out more about Moda
+  url: 'http://swagger.io'
+# Added by API Auto Mocking Plugin
+servers:
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/modawolf/Moda/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/ankurbhelawe/Moda/1.0.0
+tags:
+  - name: admin
+    description: Admin operations
+    externalDocs:
+      description: Find out more
+      url: 'http://swagger.io'
+  - name: employee
+    description: Employee operations
+    externalDocs:
+      description: Find out more
+      url: 'http://swagger.io'
+  - name: designCentre
+    description: Operations at our design centre
+    externalDocs:
+      description: Find out more about our design process
+      url: 'http://swagger.io'
+  - name: manufacturingHub
+    description: Operations at our manufacturing hubs worldwide
+    externalDocs:
+      description: Find out more about our manufacturing process
+      url: 'http://swagger.io'
+  - name: warehouse
+    description: Operations at our warehouses worldwide
+    externalDocs:
+      description: Find out more about how our warehouses work
+      url: 'http://swagger.io'
+  - name: store
+    description: Operations at our stores worldwide
+    externalDocs:
+      description: Find out more about our stores
+      url: 'http://swagger.io'
+paths: 
+  '/employee':
+    post:
+      tags: 
+        - admin
+      summary: Add a new employee to the organization
+      operationId: addEmployee
+      responses:
+        '200':
+          description: Employee added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      security:
+        - ModaAuth:
+            - 'admin'
+      requestBody:
+        $ref: '#/components/requestBodies/EmployeeCredentials'
+    put:
+      tags:
+        - admin
+      summary: Update an existing Employee record
+      operationId: updateEmployee
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Employee not found
+        '405':
+          description: Validation exception
+      security:
+        - ModaAuth:
+            - 'admin'
+      requestBody:
+        $ref: '#/components/requestBodies/EmployeeCredentials'
+  '/employee/{employeeId}': 
+    get:
+      tags:
+        - admin
+        - employee
+      summary: Find employee by ID
+      description: Returns an employee's details
+      operationId: getEmployeeById
+      parameters:
+        - name: employeeId
+          in: path
+          description: ID of employee to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee/properties/employeeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'manufacturingHubManager'
+            - 'fashionDesigner'
+            - 'warehouseManager'
+            - 'storeManager'
+            - 'patternMaster'
+            - 'skilledLabour'
+            - 'unskilledLabour'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeCredentials'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/EmployeeCredentials'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Employee not found
+    delete:
+      tags:
+        - admin
+      summary: Delete employee by ID
+      description: Deletes an employee's record
+      operationId: deleteEmployeeById
+      parameters:
+        - name: employeeId
+          in: path
+          description: ID of employee to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee/properties/employeeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Employee not found
+    put:
+      tags:
+        - admin
+      summary: Update an employee using form data
+      operationId: updateEmployeeWithForm
+      parameters:
+        - name: employeeId
+          in: path
+          description: ID of employee that needs to be updated
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee/properties/employeeId'
+      responses:
+        '405':
+          description: Invalid input
+      security:
+        - ModaAuth:
+            - 'admin'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: Name of the employee to be updated
+                  type: string
+                designation:
+                  description: Designation of the employee to be updated
+                  type: string
+                password:
+                  description: Password of the employee to be updated
+                  type: string
+  '/employee/findByDesignation':
+    get:
+      tags:
+        - admin
+      summary: Finds employees by designation
+      description: Multiple designations can be provided with comma separated strings
+      operationId: findEmployeesByDesignation
+      parameters:
+        - name: status
+          in: query
+          description: Designations to be filtered
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - admin
+                - fashionDesigner
+                - rawMaterialsSourcingHubManager
+                - yarnProcessingHubManager
+                - manufacturingHubManager
+                - warehouseManager
+                - storeManager
+                - patternMaster
+                - skilledLabour
+                - unskilledLabour
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '400':
+          description: Invalid designation value
+  '/employee/login':
+    get:
+      tags:
+        - employee
+      summary: Logs employee into the system
+      operationId: loginEmployee
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login
+          required: true
+          schema:
+            type: string
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'manufacturingHubManager'
+            - 'fashionDesigner'
+            - 'warehouseManager'
+            - 'storeManager'
+            - 'patternMaster'
+            - 'skilledLabour'
+            - 'unskilledLabour'
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  '/employee/logout':
+    get:
+      tags:
+        - employee
+      summary: Logs out current logged in employee session
+      operationId: logoutEmployee
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'manufacturingHubManager'
+            - 'fashionDesigner'
+            - 'warehouseManager'
+            - 'storeManager'
+            - 'patternMaster'
+            - 'skilledLabour'
+            - 'unskilledLabour'
+      responses:
+        default:
+          description: successful operation
+  '/designPrediction':
+    post:
+      tags:
+        - designCentre
+      summary: Add a season's design predictions
+      description: Secure operation, can be done only by an employee with designation 'fashionDesigner'.
+      operationId: addDesignPrediction
+      responses:
+        '405':
+          description: Invalid input
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+      requestBody:
+        $ref: '#/components/requestBodies/DesignPrediction'
+    put:
+      tags:
+        - designCentre
+      summary: Update an existing designPrediction object
+      description: Secure operation, can be done only by an employee with designation 'fashionDesigner'.
+      operationId: updatedesignPrediction
+      responses:
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Design Prediction not found
+        '405':
+          description: Validation exception
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+      requestBody:
+        $ref: '#/components/requestBodies/DesignPrediction'
+  '/designPrediction/{designPredictionId}': 
+    get:
+      tags:
+        - designCentre
+      summary: Find design prediction by ID
+      description: "Returns a season's design prediction (based on given ID). Secure operation, can be done only by an employee with designation 'fashionDesigner'."
+      operationId: getDesignPredictionById
+      parameters:
+        - name: designPredictionId
+          in: path
+          description: ID of design prediction to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/DesignPrediction/properties/designPredictionId'
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DesignPrediction'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DesignPrediction'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Design prediction not found
+    delete:
+      tags:
+        - designCentre
+      summary: Delete design prediction by ID
+      description: "Deletes a season's design prediction (based on given ID). Secure operation, can be done only by an employee with designation 'fashionDesigner'."
+      operationId: deleteDesignPredictionById
+      parameters:
+        - name: designPredictionId
+          in: path
+          description: ID of design prediction to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/DesignPrediction/properties/designPredictionId'
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Design prediction not found
+    put:
+      tags:
+        - designCentre
+      summary: Update a design prediction using form data
+      description: "Updates a season's design prediction (based on given ID). Secure operation, can be done only by an employee with designation 'fashionDesigner'."
+      operationId: updateDesignPredictionWithForm
+      parameters:
+        - name: designPredictionId
+          in: path
+          description: ID of design prediction that needs to be updated
+          required: true
+          schema:
+            $ref: '#/components/schemas/DesignPrediction/properties/designPredictionId'
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+      responses:
+        '405':
+          description: Invalid input
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                season:
+                  description: Season of the prediction to be updated
+                  type: string
+                year:
+                  description: Year of the prediction to be updated
+                  type: string
+                materials:
+                  description: Materials of the prediction to be updated
+                  type: array
+                  items:
+                    type: string
+                    example: Silk
+                colours:
+                  description: Colours of the prediction to be updated
+                  type: array
+                  items:
+                    type: string
+                    example: Green
+  '/design':
+    post:
+      tags:
+        - designCentre
+      summary: Add a new design
+      description: Secure operation, can be done only by an employee with designation 'fashionDesigner'.
+      operationId: addDesign
+      responses:
+        '405':
+          description: Invalid input
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+      requestBody:
+        $ref: '#/components/requestBodies/Design'
+    put:
+      tags:
+        - designCentre
+      summary: Update an existing design object
+      description: Secure operation, can be done only by an employee with designation 'fashionDesigner'.
+      operationId: updatedesign
+      responses:
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Design not found
+        '405':
+          description: Validation exception
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+      requestBody:
+        $ref: '#/components/requestBodies/Design'
+  '/design/{designId}': 
+    get:
+      tags:
+        - designCentre
+        - admin
+      summary: Find design by ID
+      description: "Returns a design (based on given ID). Secure operation, can be done only by an employee with designation 'fashionDesigner'."
+      operationId: getDesignById
+      parameters:
+        - name: designId
+          in: path
+          description: ID of design to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+            - 'admin'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Design'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Design'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Design not found
+    delete:
+      tags:
+        - designCentre
+      summary: Delete design by ID
+      description: "Delete a design (based on given ID). Secure operation, can be done only by an employee with designation 'fashionDesigner'."
+      operationId: deleteDesignById
+      parameters:
+        - name: designId
+          in: path
+          description: ID of design to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Design not found
+    put:
+      tags:
+        - designCentre
+        - admin
+      summary: Update a design using form data
+      description: "Updates a design object (based on given ID). Secure operation, can be done only by an employee with designation 'fashionDesigner' or 'admin'."
+      operationId: updateDesignWithForm
+      parameters:
+        - name: designId
+          in: path
+          description: ID of design that needs to be updated
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      responses:
+        '405':
+          description: Invalid input
+      security:
+        - ModaAuth:
+            - 'fashionDesigner'
+            - 'admin'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                designName:
+                  type: string
+                  description: Name to be updated
+                designDescription:
+                  type: string
+                  description: Description to be updated
+                demographic:
+                  type: string
+                  description: Demographic category to be updated
+                  enum:
+                    - woman
+                    - man
+                    - girl
+                    - boy
+                category:
+                  type: string
+                  description: Category of garment to be updated
+                  enum:
+                    - Jacket
+                    - Blazer
+                    - Shirt
+                    - Trousers
+                    - T-Shirt
+                    - Polo Shirt
+                    - Jeans
+                    - Hoodie
+                    - Coat
+                    - Suit
+                    - Knitwear
+                    - Tracksuit
+                    - Jogger
+                    - Dress
+                    - Jumpsuit
+                    - Top
+                    - Skirt
+                    - Shorts
+                    - Trench
+                    - Sport
+                    - Denim
+                    - Dungarees
+                    - Swimwear
+                    - Pyjamas
+                    - Underwear
+                    - Leggings
+                colour:
+                  type: string
+                  description: Colour of fabric to be updated
+                composition:
+                  type: string
+                  description: Composition to be updated
+                designImages:
+                  type: string
+                  description: Link to be updated
+                fabricType:
+                  type: string
+                  description: Type of fabric to be updated
+                  enum:
+                    - knitted
+                    - woven
+                fabricWeave:
+                  type: string
+                  description: Fabric weave type to be updated
+                  enum:
+                    - Plain weave
+                    - Rib weave
+                    - Basket weave
+                    - Twill Weave
+                    - Herringbone weave
+                    - Satin weave
+                    - Sateen weave
+                    - Leno weave
+                    - Oxford Weave
+                    - Bedford cord weave
+                    - Waffle Weave
+                    - Pile weave
+                    - Jacquard weave
+                    - Dobby weave
+                    - Crepe weave
+                    - Lappet weave
+                    - Tapestry Weave
+                    - Striped weaves
+                    - Checquered weaves
+                    - Double cloth weave
+                fabricGSM:
+                  type: string
+                  description: GSM of fabric to be updated
+                pieces:
+                  type: string
+                  description: Link to be updated
+                status:
+                  type: string
+                  description: Status to be updated
+                  enum:
+                    - incomplete
+                    - complete and pending approval
+                    - approved
+                    - rejected
+  '/manufacturingHub':
+    post:
+      tags: 
+        - admin
+      summary: Add a new Manufacturing Hub to the organization
+      operationId: addManufacturingHub
+      responses:
+        '200':
+          description: Manufacturing Hub added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      security:
+        - ModaAuth:
+            - 'admin'
+      requestBody:
+        $ref: '#/components/requestBodies/ManufacturingHub'
+    put:
+      tags:
+        - admin
+        - manufacturingHub
+      summary: Update an existing Manufacturing Hub
+      operationId: updateManufacturingHub
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+        '405':
+          description: Validation exception
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'manufacturingHubManager'
+      requestBody:
+        $ref: '#/components/requestBodies/ManufacturingHub'
+  '/manufacturingHub/{manufacturingHubId}': 
+    get:
+      tags:
+        - admin
+        - manufacturingHub
+      summary: Find Manufacturing Hub by ID
+      description: Returns Manufacturing Hub's details
+      operationId: getManufacturingHubById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+    delete:
+      tags:
+        - admin
+      summary: Delete Manufacturing Hub by ID
+      description: Deletes Manufacturing Hub's details
+      operationId: deleteManufacturingHubById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub to delete
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+  '/manufacturingHub/{manufacturingHubId}/manufacturingHubManager': 
+    get:
+      tags:
+        - admin
+        - manufacturingHub
+      summary: Get Manufacturing Hub Manager by Manufacturing Hub ID
+      description: "Returns Manufacturing Hub's Manager's details"
+      operationId: getManufacturingHubManagerById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubManager'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubManager'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+    put:
+      tags:
+        - admin
+      summary: Update a Manufacturing Hub's Manager
+      operationId: updateManufacturingHubManager
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Employee not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/Employee'
+  '/manufacturingHub/{manufacturingHubId}/patternMaster':
+    post:
+      tags: 
+        - manufacturingHub
+      summary: Add a new Pattern Master to the Manufacturing Hub
+      operationId: addPatternMaster
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Pattern Master added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/Employee'
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Hub's Pattern Master by Manufacturing Hub ID
+      description: "Returns Manufacturing Hub's Pattern Master's details"
+      operationId: getManufacturingHubPatternMasterById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/patternMaster'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/patternMaster'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+    put:
+      tags:
+        - manufacturingHub
+      summary: Update a Manufacturing Hub's Pattern Master
+      operationId: updateManufacturingHubPatternMaster
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Employee not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/Employee'
+  '/manufacturingHub/{manufacturingHubId}/cuttingMachines':
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Hub's list of Cutting Machines by Manufacturing Hub ID
+      description: "Returns Manufacturing Hub's list of Cutting Machines"
+      operationId: getManufacturingHubCuttingMachinesById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/cuttingMachines'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/cuttingMachines'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+  '/manufacturingHub/{manufacturingHubId}/cuttingMachines/{machineId}':
+    post:
+      tags: 
+        - manufacturingHub
+      summary: Add a Cutting Machine to the Manufacturing Hub
+      operationId: addCuttingMachine
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: machineId
+          in: path
+          description: ID of Machine 
+          required: true
+          schema:
+            $ref: '#/components/schemas/CuttingMachine/properties/machineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Cutting Machine added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/CuttingMachine'
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Cutting Machine by ID
+      description: "Returns Cutting Machine by ID"
+      operationId: getCuttingMachineById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: machineId
+          in: path
+          description: ID of Machine 
+          required: true
+          schema:
+            $ref: '#/components/schemas/CuttingMachine/properties/machineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuttingMachine'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CuttingMachine'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Cutting Machine not found
+    put:
+      tags:
+        - manufacturingHub
+      summary: Update an existing Cutting Machine record
+      operationId: updateCuttingMachine
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: machineId
+          in: path
+          description: ID of Machine 
+          required: true
+          schema:
+            $ref: '#/components/schemas/CuttingMachine/properties/machineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Cutting Machine not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/CuttingMachine'
+    delete:
+      tags:
+        - manufacturingHub
+      summary: Delete Cutting Machine by ID
+      description: "Deletes Cutting Machine by ID"
+      operationId: deleteCuttingMachineById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: machineId
+          in: path
+          description: ID of Machine 
+          required: true
+          schema:
+            $ref: '#/components/schemas/CuttingMachine/properties/machineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Cutting Machine not found
+  '/manufacturingHub/{manufacturingHubId}/manufacturingLines':
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Hub's list of Manufacturing Lines by Manufacturing Hub ID
+      description: "Returns Manufacturing Hub's list of Manufacturing Lines"
+      operationId: getManufacturingHubManufacturingLinesById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingLines'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingLines'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+  '/manufacturingHub/{manufacturingHubId}/manufacturingLines/{lineId}':
+    post:
+      tags: 
+        - manufacturingHub
+      summary: Add a Manufacturing Line to the Manufacturing Hub
+      operationId: addmanufacturingLine
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Manufacturing Line added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/ManufacturingLine'
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Line by ID
+      description: "Returns Manufacturing Line by ID"
+      operationId: getManufacturingLineById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line  
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingLine'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingLine'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Line not found
+    put:
+      tags:
+        - manufacturingHub
+      summary: Update an existing Manufacturing Line record
+      operationId: updateManufacturingLine
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Line not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/ManufacturingLine'
+    delete:
+      tags:
+        - manufacturingHub
+      summary: Delete Cutting Machine by ID
+      description: "Deletes Manufacturing Line by ID"
+      operationId: deleteManufacturingLineById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Line not found
+  '/manufacturingHub/{manufacturingHubId}/manufacturingLines/{lineId}/laboursAssigned':
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Lines' list of labours assigned.
+      description: "Returns Manufacturing Lines' list of labours assigned"
+      operationId: getManufacturingLinesLaboursAssignedById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line in the above Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingLine/properties/laboursAssigned'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingLine/properties/laboursAssigned'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Line not found
+  '/manufacturingHub/{manufacturingHubId}/manufacturingLines/{lineId}/labour':
+    post:
+      tags: 
+        - manufacturingHub
+      summary: Add a Labour to the Manufacturing Line
+      operationId: addLabour
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+        - name: employeeId
+          in: path
+          description: Employee ID of Labour 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee/properties/employeeId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Labour added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/Labour'
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Labour by ID
+      description: "Returns Labour by ID"
+      operationId: getLabourById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line  
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+        - name: employeeId
+          in: path
+          description: Employee ID of Labour 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee/properties/employeeId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Labour'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Labour'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Labour Record not found
+    put:
+      tags:
+        - manufacturingHub
+      summary: Update an existing Labour record
+      operationId: updateLabour
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+        - name: employeeId
+          in: path
+          description: Employee ID of Labour 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee/properties/employeeId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Labour Record not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/Labour'
+    delete:
+      tags:
+        - manufacturingHub
+      summary: Delete Labour by ID
+      description: "Deletes Labour by ID"
+      operationId: deleteLabourById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+        - name: employeeId
+          in: path
+          description: Employee ID of Labour 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Employee/properties/employeeId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Labour not found
+  '/manufacturingHub/{manufacturingHubId}/manufacturingLines/{lineId}/stitchingMachinesAssigned':
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get a Manufacturing Line's list of Stitching Machines assigned.
+      description: "Returns Manufacturing Lines' list of Stitching Machines assigned"
+      operationId: getManufacturingLinesStitchingMachinesAssignedById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line in the above Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingLine/properties/stitchingMachinesAssigned'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingLine/properties/stitchingMachinesAssigned'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Line not found
+  '/manufacturingHub/{manufacturingHubId}/manufacturingLines/{lineId}/stitchingMachine':
+    post:
+      tags: 
+        - manufacturingHub
+      summary: Add a Stitching Machine to the Manufacturing Line
+      operationId: addStitchingMachine
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+        - name: machineId
+          in: path
+          description: Machine ID of Stitching Machine 
+          required: true
+          schema:
+            $ref: '#/components/schemas/StitchingMachine/properties/machineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Stitching Machine added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/StitchingMachine'
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Stitching Machine by ID
+      description: "Returns Stitching Machine by ID"
+      operationId: getStitchingMachineById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line  
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+        - name: machineId
+          in: path
+          description: Machine ID of Stitching Machine 
+          required: true
+          schema:
+            $ref: '#/components/schemas/StitchingMachine/properties/machineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StitchingMachine'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/StitchingMachine'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Stitching Machine Record not found
+    put:
+      tags:
+        - manufacturingHub
+      summary: Update an existing Stitching Machine record
+      operationId: updateStitchingMachine
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+        - name: machineId
+          in: path
+          description: Machine ID of Stitching Machine 
+          required: true
+          schema:
+            $ref: '#/components/schemas/StitchingMachine/properties/machineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Stitching Machine Record not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/StitchingMachine'
+    delete:
+      tags:
+        - manufacturingHub
+      summary: Delete Stitching Machine by ID
+      description: "Deletes Stitching Machine by ID"
+      operationId: deleteStitchingMachineById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: lineId
+          in: path
+          description: ID of Manufacturing Line 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine/properties/lineId'
+        - name: machineId
+          in: path
+          description: Machine ID of Stitching Machine 
+          required: true
+          schema:
+            $ref: '#/components/schemas/StitchingMachine/properties/machineId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Stitching Machine record not found
+  '/manufacturingHub/{manufacturingHubId}/garmentRequests':
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Hub's list of Garment Requests by Manufacturing Hub ID
+      description: "Returns Manufacturing Hub's list of Garment Requests. Operation can be performed by an employee with designation 'manufacturingHubManager'."
+      operationId: getManufacturingHubGarmentRequestsById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/garmentRequests'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/garmentRequests'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+  '/manufacturingHub/{manufacturingHubId}/garmentRequests/{designId}':
+    post:
+      tags: 
+        - admin
+      summary: Add a Garment Request to the Manufacturing Hub
+      description: A garment request can be posted to a Manufacturing Hub by an employee with designation 'admin'.
+      operationId: addGarmentRequest
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: designId
+          in: path
+          description: ID of Garment Request 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Garment Request added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentRequest'
+    get:
+      tags:
+        - manufacturingHub
+        - admin
+      summary: Get Garment Request by ID
+      description: "Returns Garment Request by ID. Operation can be performed by an employee with designation 'admin' or 'manufacturingHubManager'."
+      operationId: getGarmentRequestById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: designId
+          in: path
+          description: ID of Garment Request 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+            - 'admin'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarmentRequest'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GarmentRequest'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Request not found
+    put:
+      tags:
+        - admin
+      summary: Update an existing Garment Request record
+      description: "Updates an existing Garment Request record. Operation can be performed by an employee with designation 'admin'."
+      operationId: updateGarmentRequest
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: designId
+          in: path
+          description: ID of Garment Request 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: GarmentRequest not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentRequest'
+    delete:
+      tags:
+        - admin
+      summary: Delete Garment Request by ID
+      description: "Deletes Garment Request by ID. Operation can be performed by an employee with designation 'admin'."
+      operationId: deleteGarmentRequestById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: designId
+          in: path
+          description: ID of Garment Request 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Request not found
+  '/manufacturingHub/{manufacturingHubId}/garmentRequests/{designId}/garmentRequestDetails':
+    get:
+      tags:
+        - manufacturingHub
+        - admin
+      summary: Get the Garment Request Details of a Garment Request Record
+      description: "Returns Garment Request Details (list of sizes and number of units of each size) of a Garment Request Record. Operation can be performed by an employee with designation 'admin' or 'manufacturingHubManager'."
+      operationId: getGarmentRequestDetailsById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: designId
+          in: path
+          description: ID of Garment Request 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+            - 'admin'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarmentRequest/properties/garmentRequestDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GarmentRequest/properties/garmentRequestDetails'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Line not found
+    post:
+      tags:
+        - admin
+      summary: Add a Garment Request Detail object to a Garment Request Record
+      description: "Adds a Garment Request Detail Object (size and number of units) to a Garment Request Record. Operation can be performed by an employee with designation 'admin'."
+      operationId: postGarmentRequestDetailObjectById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: designId
+          in: path
+          description: ID of Garment Request 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Garment Request Detail object added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentRequestDetail'
+    put:
+      tags:
+        - admin
+      summary: Update a Garment Request Detail object in a Garment Request Record
+      description: "Updates a Garment Request Detail Object (size and number of units) of a Garment Request Record. Operation can be performed by an employee with designation 'admin'."
+      operationId: updateGarmentRequestDetailObjectById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: designId
+          in: path
+          description: ID of Garment Request 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Request Detail Record not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentRequestDetail'
+    delete:
+      tags:
+        - admin
+      summary: Delete a Garment Request Detail object in a Garment Request Record
+      description: "Deletes a Garment Request Detail Object (size and number of units) of a Garment Request Record. Operation can be performed by an employee with designation 'admin'."
+      operationId: deleteGarmentRequestDetailObjectById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: designId
+          in: path
+          description: ID of Garment Request 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Design/properties/designId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Request Detail Object not found
+  '/manufacturingHub/{manufacturingHubId}/garmentsToProcess':
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Hub's list of Garments to Process by Manufacturing Hub ID
+      description: "Returns Manufacturing Hub's list of Garments to Process"
+      operationId: getManufacturingHubGarmentsToProcessById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/garmentsToProcess'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/garmentsToProcess'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+  '/manufacturingHub/{manufacturingHubId}/garmentsToProcess/{jobId}':
+    post:
+      tags: 
+        - manufacturingHub
+      summary: Add a Garment Request to the list of garments approved for processing
+      operationId: addGarmentToProcess
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment to Process 
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Garment Processing Job added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentApprovedForProcessing'
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get record of a Garment batch from list of Garments to Process by ID
+      description: "Returns record of a Garment batch from list of Garments to Process by Job ID"
+      operationId: getGarmentToProcess
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment to Process 
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarmentApprovedForProcessing'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GarmentApprovedForProcessing'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+    put:
+      tags:
+        - manufacturingHub
+      summary: Update an existing record in the list of garments approved for processing
+      operationId: updateGarmentToProcess
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment to Process 
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentApprovedForProcessing'
+    delete:
+      tags:
+        - manufacturingHub
+      summary: Delete Garment Batch from the list of garments approved for processing
+      description: "Deletes Garment Batch from the list of garments approved for processing."
+      operationId: deleteGarmentToProcess
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment to Process 
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+  '/manufacturingHub/{manufacturingHubId}/garmentsInProcessing':
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Hub's list of Garments in Processing by Manufacturing Hub ID
+      description: "Returns Manufacturing Hub's list of Garments in Processing"
+      operationId: getManufacturingHubGarmentsinProcessingById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/garmentsInProcessing'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/garmentsInProcessing'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+  '/manufacturingHub/{manufacturingHubId}/garmentsInProcessing/{jobId}':
+    post:
+      tags: 
+        - manufacturingHub
+      summary: Add a Garment Batch to the list of garments currently processing
+      operationId: addGarmentInProcessing
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment in Processing 
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Garment Processing Job added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentInProcessing'
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get record of a Garment batch in processing by ID
+      description: "Returns record of a Garment batch in processing by Job ID"
+      operationId: getGarmentInProcessing
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment Batch (in Processing) to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarmentInProcessing'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GarmentInProcessing'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+    put:
+      tags:
+        - manufacturingHub
+      summary: Update an existing record in the list of garments currently in processing
+      operationId: updateGarmentInProcessing
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment Batch (in Processing) to be updated
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentInProcessing'
+    delete:
+      tags:
+        - manufacturingHub
+      summary: Delete Garment Batch from the list of garments currently in processing
+      description: "Deletes Garment Batch from the list of garments in processing."
+      operationId: deleteGarmentInProcessing
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment Batch (in Processing) to be deleted
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+  '/manufacturingHub/{manufacturingHubId}/garmentsProcessed':
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get Manufacturing Hub's list of Garments Processed by Manufacturing Hub ID
+      description: "Returns Manufacturing Hub's list of Garment Batches which finished Processing."
+      operationId: getManufacturingHubGarmentsProcessedById
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/garmentsProcessed'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ManufacturingHub/properties/garmentsProcessed'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Manufacturing Hub not found
+  '/manufacturingHub/{manufacturingHubId}/garmentsProcessed/{jobId}':
+    post:
+      tags: 
+        - manufacturingHub
+      summary: Add a Garment Batch to the list of garment batches that finished processing
+      operationId: addGarmentProcessed
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment Batch Processed 
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Garment Processed Record added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentProcessed'
+    get:
+      tags:
+        - manufacturingHub
+      summary: Get record of a Garment batch from the list of garment batches that finished processing
+      description: "Returns record of a Garment batch in the list of garment batches that finished processing by Job ID."
+      operationId: getGarmentProcessed
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment Batch (Processed) to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarmentProcessed'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GarmentProcessed'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+    put:
+      tags:
+        - manufacturingHub
+      summary: Update an existing record in the list of garments that finished processing
+      operationId: updateGarmentProcessed
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment Batch (Processed) to be updated
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/GarmentProcessed'
+    delete:
+      tags:
+        - manufacturingHub
+      summary: Delete Garment Batch from the list of garments that finished processing
+      description: "Deletes Garment Batch from the list of garments that finished processing."
+      operationId: deleteGarmentProcessed
+      parameters:
+        - name: manufacturingHubId
+          in: path
+          description: ID of Manufacturing Hub 
+          required: true
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        - name: jobId
+          in: path
+          description: Job ID of Garment Batch (Processed) to be deleted
+          required: true
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing/properties/jobId'
+      security:
+        - ModaAuth:
+            - 'manufacturingHubManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Garment Batch not found
+  '/warehouse':
+    post:
+      tags: 
+        - admin
+      summary: Add a new Warehouse to the organization
+      operationId: addWarehouse
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Warehouse added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/Warehouse'
+    put:
+      tags:
+        - admin
+        - warehouse
+      summary: Update an existing Warehouse
+      operationId: updateWarehouse
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Warehouse not found
+        '405':
+          description: Validation exception
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'warehouseManager'
+      requestBody:
+        $ref: '#/components/requestBodies/Warehouse'
+  '/warehouse/{warehouseId}': 
+    get:
+      tags:
+        - admin
+        - warehouse
+      summary: Find Warehouse by ID
+      description: Returns Warehouse's details
+      operationId: getWarehouseById
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Warehouse not found
+    delete:
+      tags:
+        - admin
+      summary: Delete Warehouse by ID
+      description: Deletes Warehouse's details
+      operationId: deleteWarehouseById
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse to delete
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Warehouse not found
+  '/warehouse/{warehouseId}/warehouseManager': 
+    get:
+      tags:
+        - admin
+        - warehouse
+      summary: Get Warehouse Manager by Warehouse ID
+      description: "Returns Warehouse's Manager's details"
+      operationId: getWarehouseManagerById
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse/properties/warehouseManager'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Warehouse/properties/warehouseManager'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Warehouse not found
+    put:
+      tags:
+        - admin
+      summary: Update a Warehouse's Manager
+      operationId: updateWarehouseManager
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Employee not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/Employee'
+  '/warehouse/{warehouseId}/storesManaged':
+    get:
+      tags:
+        - warehouse
+        - admin
+      summary: Get Warehouse's list of Stores Managed by warehouse ID
+      description: "Returns Warehouse's list of Stores Managed"
+      operationId: getWarehouseStoresManagedById
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of warehouse 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse/properties/storesManaged'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Warehouse/properties/storesManaged'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Warehouse not found
+  '/warehouse/{warehouseId}/storesManaged/{storeId}':
+    post:
+      tags: 
+        - admin
+      summary: Add a Store to the list of stores managed by a warehouse
+      operationId: addStoreToWarehouse
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: storeId
+          in: path
+          description: ID of Store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Store added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/Store'
+    get:
+      tags: 
+        - admin
+        - warehouse
+      summary: Get a Store from the list of stores managed by a warehouse
+      operationId: getStoreFromWarehouse
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: storeId
+          in: path
+          description: ID of Store 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Store not found
+    put:
+      tags: 
+        - admin
+      summary: Update a Store in the list of stores managed by a warehouse
+      operationId: PutStoreToWarehouse
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: storeId
+          in: path
+          description: ID of Store 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Store not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/Store'
+    delete:
+      tags: 
+        - admin
+      summary: Delete a Store from the list of stores managed by a warehouse
+      operationId: deleteStoreFromWarehouse
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: storeId
+          in: path
+          description: ID of Store 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Store not found
+  '/warehouse/{warehouseId}/inventory':
+    get:
+      tags:
+        - warehouse
+        - admin
+      summary: Get inventory by warehouse ID
+      description: "Returns a Warehouse's inventory"
+      operationId: getWarehouseInventoryById
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse/properties/warehouseInventory'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Warehouse/properties/warehouseInventory'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Warehouse not found
+  '/warehouse/{warehouseId}/inventory/{designId}':
+    post:
+      tags: 
+        - warehouse
+      summary: Add a Design to the Warehouse Inventory
+      operationId: addDesignToWarehouseInventory
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: designId
+          in: path
+          description: Design ID of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designId'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Design added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/InventoryItem'
+    get:
+      tags: 
+        - warehouse
+      summary: Return a Design from the Warehouse Inventory
+      operationId: getDesignFromWarehouseInventory
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: designId
+          in: path
+          description: Design ID of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designId'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+    put:
+      tags: 
+        - warehouse
+      summary: Update a Design in the Warehouse Inventory
+      operationId: updateDesignInWarehouseInventory
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: designId
+          in: path
+          description: Design ID of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designId'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Design not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/InventoryItem'
+    delete:
+      tags: 
+        - warehouse
+      summary: Delete a Design from the Warehouse Inventory
+      operationId: deleteDesignFromWarehouseInventory
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: designId
+          in: path
+          description: Design ID of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designId'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Design not found
+  '/warehouse/{warehouseId}/inventory/{name}':
+    get:
+      tags: 
+        - warehouse
+      summary: Return a Design from the Warehouse Inventory by Name
+      operationId: getDesignFromWarehouseInventoryByName
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: name
+          in: path
+          description: Name of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designName'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/warehouse/{warehouseId}/inventory/{keyword}':
+    get:
+      tags: 
+        - warehouse
+      summary: Return a Design from the Warehouse Inventory by keyword
+      operationId: getDesignFromWarehouseInventoryByKeyword
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: keyword
+          in: path
+          description: Keyword related to Design in Warehouse Inventory
+          required: true
+          schema:
+            type: string
+            example: Coat
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/warehouse/{warehouseId}/inventory/{demographic}':
+    get:
+      tags: 
+        - warehouse
+      summary: Return a Design from the Warehouse Inventory by Demographic
+      operationId: getDesignFromWarehouseInventoryByDemographic
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: demographic
+          in: path
+          description: Demographic of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/demographic'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/warehouse/{warehouseId}/inventory/{category}':
+    get:
+      tags: 
+        - warehouse
+      summary: Return a Design from the Warehouse Inventory by Category
+      operationId: getDesignFromWarehouseInventoryByCategory
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: category
+          in: path
+          description: Category of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/category'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/warehouse/{warehouseId}/inventory/{colour}':
+    get:
+      tags: 
+        - warehouse
+      summary: Return a Design from the Warehouse Inventory by colour
+      operationId: getDesignFromWarehouseInventoryByColour
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: colour
+          in: path
+          description: Colour of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/colour'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/warehouse/{warehouseId}/inventory/{composition}':
+    get:
+      tags: 
+        - warehouse
+      summary: Return a Design from the Warehouse Inventory by composition
+      operationId: getDesignFromWarehouseInventoryByComposition
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: composition
+          in: path
+          description: Composition of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/composition'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/warehouse/{warehouseId}/inventory/{size}':
+    get:
+      tags: 
+        - warehouse
+      summary: Return a Design from the Warehouse Inventory by size
+      operationId: getDesignFromWarehouseInventoryBySize
+      parameters:
+        - name: warehouseId
+          in: path
+          description: ID of Warehouse
+          required: true
+          schema:
+            $ref: '#/components/schemas/Warehouse/properties/warehouseId'
+        - name: size
+          in: path
+          description: Size of Design in Warehouse Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/InventoryItemDetail/properties/size'
+      security:
+        - ModaAuth:
+            - 'warehouseManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/store':
+    post:
+      tags: 
+        - admin
+      summary: Add a new Store to the organization
+      operationId: addStore
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Store added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/Store'
+    put:
+      tags:
+        - admin
+        - store
+      summary: Update an existing Store
+      operationId: updateStore
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'storeManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Store not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/Store'
+  '/store/{storeId}': 
+    get:
+      tags:
+        - admin
+        - store
+      summary: Find Store by ID
+      description: Returns Store's details
+      operationId: getStoreId
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Store not found
+    delete:
+      tags:
+        - admin
+      summary: Delete Store by ID
+      description: Deletes Store's details
+      operationId: deleteStoreById
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store to delete
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Store not found
+  '/store/{storeId}/storeManager': 
+    get:
+      tags:
+        - admin
+        - store
+      summary: Get Store Manager by Store ID
+      description: "Returns Store's Manager's details"
+      operationId: getStoreManagerById
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store/properties/storeManager'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Store/properties/storeManager'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Store not found
+    put:
+      tags:
+        - admin
+      summary: Update a Store's Manager
+      operationId: updateStoreManager
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Employee not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/Employee'
+  '/store/{storeId}/inventory':
+    get:
+      tags:
+        - store
+        - admin
+      summary: Get inventory by store ID
+      description: "Returns a store's inventory"
+      operationId: getStoreInventoryById
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store 
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+      security:
+        - ModaAuth:
+            - 'admin'
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store/properties/storeInventory'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Store/properties/storeInventory'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Store not found
+  '/store/{storeId}/inventory/{designId}':
+    post:
+      tags: 
+        - store
+      summary: Add a Design to the Store Inventory
+      operationId: addDesignToStoreInventory
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: designId
+          in: path
+          description: Design ID of Design in Store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designId'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Design added successfully
+        '401':
+          description: Authentication failed
+        '405':
+          description: Invalid input
+      requestBody:
+        $ref: '#/components/requestBodies/InventoryItem'
+    get:
+      tags: 
+        - store
+      summary: Return a Design from the Store Inventory
+      operationId: getDesignFromStoreInventory
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: designId
+          in: path
+          description: Design ID of Design in Store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designId'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+    put:
+      tags: 
+        - store
+      summary: Update a Design in the Store Inventory
+      operationId: updateDesignInStoreInventory
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: designId
+          in: path
+          description: Design ID of Design in Store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designId'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Design not found
+        '405':
+          description: Validation exception
+      requestBody:
+        $ref: '#/components/requestBodies/InventoryItem'
+    delete:
+      tags: 
+        - store
+      summary: Delete a Design from the Store Inventory
+      operationId: deleteDesignFromStoreInventory
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of Store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: designId
+          in: path
+          description: Design ID of Design in Store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designId'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Design not found
+  '/store/{storeId}/inventory/{name}':
+    get:
+      tags: 
+        - store
+      summary: Return a Design from the Store Inventory by Name
+      operationId: getDesignFromStoreInventoryByName
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: name
+          in: path
+          description: Name of Design in store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/designName'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/store/{storeId}/inventory/{keyword}':
+    get:
+      tags: 
+        - store
+      summary: Return a Design from the store Inventory by keyword
+      operationId: getDesignFromStoreInventoryByKeyword
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: keyword
+          in: path
+          description: Keyword related to Design in store Inventory
+          required: true
+          schema:
+            type: string
+            example: Coat
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/store/{storeId}/inventory/{demographic}':
+    get:
+      tags: 
+        - store
+      summary: Return a Design from the store Inventory by Demographic
+      operationId: getDesignFromStoreInventoryByDemographic
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: demographic
+          in: path
+          description: Demographic of Design in store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/demographic'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/store/{storeId}/inventory/{category}':
+    get:
+      tags: 
+        - store
+      summary: Return a Design from the store Inventory by Category
+      operationId: getDesignFromStoreInventoryByCategory
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: category
+          in: path
+          description: Category of Design in store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/category'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/store/{storeId}/inventory/{colour}':
+    get:
+      tags: 
+        - store
+      summary: Return a Design from the store Inventory by colour
+      operationId: getDesignFromStoreInventoryByColour
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: colour
+          in: path
+          description: Colour of Design in store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/colour'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/store/{storeId}/inventory/{composition}':
+    get:
+      tags: 
+        - store
+      summary: Return a Design from the store Inventory by composition
+      operationId: getDesignFromStoreInventoryByComposition
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: composition
+          in: path
+          description: Composition of Design in store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/BasicDesign/properties/composition'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+  '/store/{storeId}/inventory/{size}':
+    get:
+      tags: 
+        - store
+      summary: Return a Design from the store Inventory by size
+      operationId: getDesignFromStoreInventoryBySize
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of store
+          required: true
+          schema:
+            $ref: '#/components/schemas/Store/properties/storeId'
+        - name: size
+          in: path
+          description: Size of Design in store Inventory
+          required: true
+          schema:
+            $ref: '#/components/schemas/InventoryItemDetail/properties/size'
+      security:
+        - ModaAuth:
+            - 'storeManager'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid ID entered
+        '404':
+          description: Inventory Item not found
+components:
+  schemas:
+    EmployeeCredentials:
+      type: object
+      required:
+        - name
+        - employeeId
+        - designation
+        - username
+        - password
+      properties:
+        employeeId:
+          type: string
+          example: ADMIN0001
+        name:
+          type: string
+          example: Anna Wintour
+        password:
+          type: string
+          example: 'ADMIN0001#!123@ab'
+        designation:
+          type: string
+          description: designation of employee in organization
+          enum:
+            - admin
+            - fashionDesigner
+            - manufacturingHubManager
+            - warehouseManager
+            - storeManager
+            - patternMaster
+            - skilledLabour
+            - unskilledLabour
+      xml:
+        name: EmployeeCredentials
+    Employee:
+      type: object
+      required:
+        - name
+        - employeeId
+        - designation
+      properties:
+        employeeId:
+          $ref: "#/components/schemas/EmployeeCredentials/properties/employeeId"
+        name:
+          $ref: "#/components/schemas/EmployeeCredentials/properties/name"
+        designation:
+          $ref: "#/components/schemas/EmployeeCredentials/properties/designation"
+      xml:
+        name: Employee
+    DesignPrediction:
+      type: object
+      required:
+        - designPredictionId
+      properties:
+        designPredictionId:
+          type: string
+          example: DSP0092
+        season:
+          type: string
+          example: Spring Season
+        year:
+          type: string
+          example: '2020'
+        materials:
+          type: array
+          items:
+            type: string
+            example: Satin
+        colours:
+          type: array
+          items:
+            type: string
+            example: Blue
+      xml:
+        name: DesignPrediction
+    Design:
+      type: object
+      required:
+        - designId
+        - category
+        - demographic
+        - composition
+        - fabricType
+        - fabricWeave
+        - fabricGSM
+        - colour
+        - designImages
+        - pieces
+      properties:
+        designId:
+          type: string
+          example: DES0021
+        designName:
+          type: string
+          example: 'Tailored Chintz Comfort Suit'
+        designDescription:
+          type: string
+          example: "Blazer with a notched lapel collar and a detachable pin detail. Featuring long sleeves with decorative buttons on the cuffs, a chest welt pocket, flap pockets at the hip, an inside pocket, double back vent and front button fastening. Slim fit trousers with front pockets, jetted back pockets and zip fly and button fastening."
+        demographic:
+          type: string
+          description: Demographic category of the intended user
+          enum:
+            - woman
+            - man
+            - girl
+            - boy
+        category:
+          type: string
+          description: Category of garment
+          enum:
+            - Jacket
+            - Blazer
+            - Shirt
+            - Trousers
+            - T-Shirt
+            - Polo Shirt
+            - Jeans
+            - Hoodie
+            - Coat
+            - Suit
+            - Knitwear
+            - Tracksuit
+            - Jogger
+            - Dress
+            - Jumpsuit
+            - Top
+            - Skirt
+            - Shorts
+            - Trench
+            - Sport
+            - Denim
+            - Dungarees
+            - Swimwear
+            - Pyjamas
+            - Underwear
+            - Leggings
+        colour:
+          type: string
+          description: Colour of fabric
+          example: 'Blue'
+        composition:
+          type: string
+          description: The composition of raw material to be used
+          example: '70% COTTON 27% POLYESTER 3% ELASTANE'
+        designImages:
+          type: string
+          description: Link to the folder of pictures of the design prototype
+          example: 'https://drive.google.com/drive/folders/1ys92cPT-GpLAxT_kf8Fv99kDmlcH2oVS?usp=sharing'
+        fabricType:
+          type: string
+          description: Type of fabric
+          enum:
+            - knitted
+            - woven
+        fabricWeave:
+          type: string
+          description: The way warp and weft yarns are interlaced in a fabric
+          enum:
+            - Plain weave
+            - Rib weave
+            - Basket weave
+            - Twill Weave
+            - Herringbone weave
+            - Satin weave
+            - Sateen weave
+            - Leno weave
+            - Oxford Weave
+            - Bedford cord weave
+            - Waffle Weave
+            - Pile weave
+            - Jacquard weave
+            - Dobby weave
+            - Crepe weave
+            - Lappet weave
+            - Tapestry Weave
+            - Striped weaves
+            - Checquered weaves
+            - Double cloth weave
+        fabricGSM:
+          type: string
+          description: Grams per Square Metre (GSM) of fabric
+          example: '120'
+        pieces:
+          type: string
+          description: Link to blueprint of individual pieces (to be cut out separately and stitched together to make up the garment)
+          example: 'https://drive.google.com/file/d/1T9vVXIlhOK7G7hldGh4w-sL2JKxqcGxw/view?usp=sharing'
+        status:
+          type: string
+          description: Status of the design
+          enum:
+            - incomplete
+            - complete and pending approval
+            - approved
+            - rejected
+      xml:
+        name: Design
+    BasicDesign:
+      type: object
+      properties:
+        designId:
+          $ref: "#/components/schemas/Design/properties/designId"
+        designName:
+          $ref: "#/components/schemas/Design/properties/designName"
+        designDescription:
+          $ref: "#/components/schemas/Design/properties/designDescription"
+        demographic:
+          $ref: "#/components/schemas/Design/properties/demographic"
+        category:
+          $ref: "#/components/schemas/Design/properties/category"
+        colour:
+          $ref: "#/components/schemas/Design/properties/colour"
+        composition:
+          $ref: "#/components/schemas/Design/properties/composition"
+        designImages:
+          $ref: "#/components/schemas/Design/properties/designImages"
+      xml:
+        name: BasicDesign
+    CuttingMachine:
+      type: object
+      required: 
+        - machineId
+        - manufacturingHubId
+        - dailyProductionCapacity
+      properties:
+        machineId:
+          type: string
+          example: MAC0321
+        manufacturingHubId:
+          $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        dailyProductionCapacity:
+          type: number
+          description: Number of units of fabric it can cut in a day
+          example: 2000
+      xml:
+        name: CuttingMachine
+    StitchingMachine:
+      type: object
+      required: 
+        - machineId
+        - manufacturingHubId
+        - machineType
+      properties:
+        machineId:
+          type: string
+          example: MAS0023
+        manufacturingHubId:
+          $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        machineType:
+          type: string
+          enum:
+            - Domestic model sewing machine 
+            - Industrial model sewing machine 
+            - Hand operated sewing machine
+            - Treadle sewing machine
+            - Mechanical sewing machines
+            - Electronic sewing machine
+            - Computerized sewing machine
+            - Mini sewing machines
+            - Lockstitch machine
+            - Chain stitch machine
+            - Blind stitch machine 
+            - Cover stitch machine
+            - Sergers
+            - Safety stitch machine
+            - Flat seam machine
+            - Bar tack sewing machine
+            - Button sewing machine
+            - Long Arm quilting Sewing Machine
+            - Embroidery only Sewing machine
+      xml:
+        name: StitchingMachine
+    Labour:
+      type: object
+      properties:
+        labour:
+          $ref: '#/components/schemas/Employee'
+        dailyProductionCapacity:
+          type: number
+          description: Daily production capacity of the labour in units
+          example: 15
+      xml:
+        name: Labour
+    ManufacturingLine:
+      type: object
+      required:
+       - lineId
+       - manufacturingHubId
+      properties:
+        lineId:
+          type: string
+          example: LIN0003
+        manufacturingHubId:
+          $ref: '#/components/schemas/ManufacturingHub/properties/manufacturingHubId'
+        laboursAssigned:
+          type: array
+          items:
+            $ref: '#/components/schemas/Labour'
+        stitchingMachinesAssigned:
+          type: array
+          items:
+            $ref: '#/components/schemas/StitchingMachine'
+        availabilityStatus:
+          type: string
+          description: Availability status of line
+          enum:
+            - Available
+            - Busy
+      xml:
+        name: ManufacturingLine
+    GarmentRequestDetail:
+      type: object
+      required:
+        - size
+        - units
+      properties:
+        size: 
+          type: string
+          description: Size of garment
+          enum:
+            - XXS
+            - XS
+            - S
+            - M
+            - L
+            - XL
+            - XXL
+        units:
+          type: number
+          description: Number of units of this size
+          minimum: 1000
+          maximum: 10000
+      xml:
+        name: GarmentRequestDetail
+    GarmentRequest:
+      type: object
+      required: 
+        - design
+        - destinationWarehouse
+      properties:
+        design:
+          $ref: '#/components/schemas/Design'
+        garmentRequestDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/GarmentRequestDetail'
+        destinationWarehouse:
+          type: string
+          description: Location of the destination warehouse where the ready garment batch must be shipped
+          example: Paris Warehouse, Paris, France
+      xml:
+        name: GarmentRequest
+    GarmentApprovedForProcessing:
+      type: object
+      required:
+        - jobId
+        - garmentRequest
+      properties:
+        jobId:
+          type: string
+          description: Job ID for approved garment requests
+          example: MHJ0005
+        garmentRequest:
+          $ref: '#/components/schemas/GarmentRequest'
+        patternPaperDesign:
+          type: string
+          description: "Link to Pattern Paper Design for cutting machines set by employee with designation 'patternMaster'"
+          example: 'https://drive.google.com/file/d/1JEltn05tedFsmouiDOH22xTXcKNALQjm/view?usp=sharing'
+        numberOfManufacturingLines:
+          type: number
+          description: Number of lines assigned to this garment request (decided by the Hub Manager)
+          example: 5
+        leadTime:
+          type: number
+          description: Estimated number of days it will take to complete the request
+          example: 20
+      xml:
+        name: GarmentApprovedForProcessing
+    GarmentInProcessing:
+      type: object
+      properties:
+        garmentApprovedForProcessing:
+          $ref: '#/components/schemas/GarmentApprovedForProcessing'
+        stage: 
+          type: string
+          description: Stage of the garment batch in the manufacturing cycle
+          enum:
+            - Cutting
+            - Stitching
+            - Embroidery
+            - Screen Printing
+            - Tagging
+            - Pressing
+            - Quality Check
+        status:
+          type: string
+          description: Status of the batch in a particular stage
+          enum:
+            - waiting
+            - processing
+            - ready for next stage
+      xml:
+        name: GarmentInProcessing
+    GarmentProcessed:
+      type: object
+      properties:
+        garmentDetails:
+          $ref: '#/components/schemas/GarmentApprovedForProcessing'
+        status:
+          type: string
+          description: Status of a processed garment batch
+          enum:
+            - preparing shipment
+            - ready for shipping
+            - shipment dispatched
+      xml:
+        name: GarmentProcessed
+    ManufacturingHub: 
+      type: object
+      required:
+        - manufacturingHubId
+        - name
+        - location
+        - manufacturingHubManager
+      properties:
+        manufacturingHubId:
+          type: string
+          example: MH0003
+        name:
+          type: string
+          example: Moda Manufacturing Hub, Havana, Cuba
+        location:
+          type: string
+          description: location of the manufacturing hub
+          example: Havana, Cuba
+        manufacturingHubManager:
+          $ref: '#/components/schemas/Employee'
+        patternMaster:
+          $ref: '#/components/schemas/Employee'
+        cuttingMachines:
+          type: array
+          items:
+            $ref: '#/components/schemas/CuttingMachine'
+        manufacturingLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManufacturingLine'
+        garmentRequests:
+          type: array
+          items:
+            $ref: '#/components/schemas/GarmentRequest'
+        garmentsToProcess:
+          type: array
+          items:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing'
+        garmentsInProcessing:
+          type: array
+          items:
+            $ref: '#/components/schemas/GarmentInProcessing'
+        garmentsProcessed:
+          type: array
+          items:
+            $ref: '#/components/schemas/GarmentProcessed'
+      xml:
+        name: ManufacturingHub
+    Store: 
+      type: object
+      required:
+        - storeId
+        - name
+        - location
+        - storeManager
+      properties:
+        storeId:
+          type: string
+          example: STR0572
+        name:
+          type: string
+          example: 'Moda Store, Phoenix Marketcity, Chennai, India'
+        location:
+          type: string
+          description: location of the store
+          example: Chennai, India
+        storeManager:
+          $ref: '#/components/schemas/Employee'
+        storeInventory:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryItem'
+      xml:
+        name: Store
+    Warehouse: 
+      type: object
+      required:
+        - warehouseId
+        - name
+        - location
+        - warehouseManager
+      properties:
+        warehouseId:
+          type: string
+          example: WRH0052
+        name:
+          type: string
+          example: 'Moda Warehouse, India'
+        location:
+          type: string
+          description: location of the warehouse
+          example: Chennai, India
+        warehouseManager:
+          $ref: '#/components/schemas/Employee'
+        warehouseInventory:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryItem'
+        storesManaged:
+          type: array
+          items:
+            $ref: '#/components/schemas/Store'
+      xml:
+        name: Warehouse
+    InventoryItemDetail:
+      type: object
+      required:
+        - size
+        - units
+      properties:
+        size: 
+          type: string
+          description: Size of garment
+          enum:
+            - XXS
+            - XS
+            - S
+            - M
+            - L
+            - XL
+            - XXL
+        units:
+          type: number
+          description: Number of units of this size
+          minimum: 1000
+          maximum: 10000
+      xml:
+        name: InventoryItemDetail
+    InventoryItem:
+      type: object
+      required:
+      - design
+      - units
+      properties: 
+        design:
+          $ref: '#/components/schemas/BasicDesign'
+        inventoryItemDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryItemDetail'
+      xml:
+        name: InventoryItem
+  requestBodies:
+    EmployeeCredentials:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EmployeeCredentials'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/EmployeeCredentials'
+      description: Employee object that needs to be added to the organization
+      required: true
+    Employee:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Employee'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Employee'
+      description: Employee object
+      required: true
+    DesignPrediction:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DesignPrediction'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/DesignPrediction'
+      description: Design Prediction object for a season
+      required: true
+    Design:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Design'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Design'
+      description: Design details for a particular design
+      required: true
+    ManufacturingHub:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ManufacturingHub'
+      description: Manufacturing Hub details
+      required: true
+    CuttingMachine:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CuttingMachine'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/CuttingMachine'
+      description: Cutting Machine details
+      required: true
+    StitchingMachine:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StitchingMachine'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/StitchingMachine'
+      description: Stitching Machine details
+      required: true
+    Labour:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Labour'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Labour'
+      description: Labour details
+      required: true
+    ManufacturingLine:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ManufacturingLine'
+      description: Manufacturing Line details
+      required: true
+    GarmentRequestDetail:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GarmentRequestDetail'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/GarmentRequestDetail'
+      description: Garment Request Details (Number of units of every size)
+      required: true
+    GarmentRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GarmentRequest'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/GarmentRequest'
+      description: Garment Request Record
+      required: true
+    GarmentApprovedForProcessing:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/GarmentApprovedForProcessing'
+      description: Garment Request Record which is approved for processing
+      required: true
+    GarmentInProcessing:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GarmentInProcessing'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/GarmentInProcessing'
+      description: Garment Request Record in processing
+      required: true
+    GarmentProcessed:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GarmentProcessed'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/GarmentProcessed'
+      description: Garment Request Record whose processing is complete
+      required: true
+    Warehouse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Warehouse'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Warehouse'
+      description: Warehouse details
+      required: true
+    Store:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Store'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Store'
+      description: Store details
+      required: true
+    InventoryItem:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InventoryItem'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/InventoryItem'
+      description: Inventory Item details
+      required: true
+  securitySchemes:
+    ModaAuth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://moda.com/oauth/dialog'
+          scopes:
+            'admin': Grants access to admin
+            'manufacturingHubManager': Grants access to manufacturing hub manager
+            'fashionDesigner': Grants access to fashion designer
+            'warehouseManager': Grants access to warehouse manager
+            'storeManager': Grants access to store manager
+            'patternMaster': Grants access to pattern master
+            'unskilledLabour': Grants access to unskilled labour
+            'skilledLabour': Grants access to skilled labour
