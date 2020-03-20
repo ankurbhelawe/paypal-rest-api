@@ -18,4 +18,8 @@ Some pre-saved logins that can be used to log in:
 | Teacher ID | Password |
 |------------|----------|
 | T0001  | alok@123|
+<<<<<<< HEAD
 | T0002  | malathi@123|
+=======
+| T0002  | malathi@123|
+>>>>>>> e277c1688bc7cb36db5e96125273a750b4ca1a3a
